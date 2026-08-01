@@ -36,9 +36,11 @@ jobs:
     steps:
       - name: get_code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
 
       - name: Trufflehog Secrets Scan
-        uses: trufflesecurity/trufflehog@v3 
+        uses: trufflesecurity/trufflehog@main 
         with:
           path: ./
           base: ""
