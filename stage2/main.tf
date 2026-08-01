@@ -91,7 +91,7 @@ resource "aws_ecs_task_definition" "django_task" {
     image        = "${data.aws_ecr_repository.django_app.repository_url}:latest"
     essential    = true
 portMappings = [{ containerPort = 8000, hostPort = 8000 }]    
-environment  = [{ name = "DJANGO_SECRET_KEY"; value = var.DJANGO_SECRET_KEY_PROD }]
+environment  = [{ name = "DJANGO_SECRET_KEY", value = var.DJANGO_SECRET_KEY_PROD }]
   }])
 }
 
