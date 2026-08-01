@@ -4,9 +4,12 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+ENV python manage.py collectstatic --noinput 
+run python manage.py migrate --noinput
 
 EXPOSE 8000
 
