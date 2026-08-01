@@ -90,3 +90,37 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+          
+      - name: Log in to AWS ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: docker_build_tag_push
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          docker build -t application-final .
+          docker tag application-final $ECR_REGISTRY/django_image:latest
+          docker push $ECR_REGISTRY/django_image:latest
+          
+
+  terraform-stage-2:
+    needs: build-tag-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: get-code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Authenticate to AWS via Keys
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+        
+      - name: terraform-stage-2
+        uses: ./.github/actions/terraform
+        with:
+          STATE_KEY: ${{ secrets.STATE_KEY }}
+          TF_STAGE: 'stage2' 
+          DJANGO_SECRET_KEY_PROD: ${{ secrets.DJANGO_SECRET_KEY_PROD }}
