@@ -24,9 +24,14 @@ jobs:
         env:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
         run: |
-          docker run -d -p 8000:8000 -e DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" pipeline-test
-
+          docker run -d --name django-smoke-test -p 8000:8000 \
+            -e DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" \
+            -e ALLOWED_HOSTS="localhost,127.0.0.1" \
+            pipeline-test
+            
+          #docker run -d -p 8000:8000 -e DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" pipeline-test
+          
       - name: curl-ftw
         run: |
           sleep 10
-          curl -f http://localhost:8000/
+          curl -f http://localhost:8000/ || (echo "=== DJANGO EXCEPTION TRAILING LOGS ===" && docker logs django-smoke-test && exit 1)
