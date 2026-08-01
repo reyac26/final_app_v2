@@ -6,11 +6,7 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket = "nereydacastro-final-state-bucket-v2"
-    key    = "stage1/terraform.tfstate"
-    region = "us-east-1"
-  }
+  backend "s3" {} 
 }
 
 provider "aws" {
@@ -23,4 +19,9 @@ resource "aws_ecr_repository" "django_app" {
   image_scanning_configuration {
     scan_on_push = true
   }
+}
+
+import {
+  to = aws_ecr_repository.django_app
+  id = "django_image"
 }
