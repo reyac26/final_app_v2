@@ -1,1 +1,10 @@
-
+name: 'SBOM Generation and Scanning'
+description: 'Generates a software bill of materials and scans for known vulnerabilities'
+author: 'nereyda'
+outputs:
+  sbom-file:
+    description: 'the syft generated sbom'
+    value: 'sbom.json'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
