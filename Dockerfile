@@ -8,9 +8,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'build-time-placeholder-key-string')
+ENV DJANGO_SECRET_KEY="build-time-placeholder-key-string"
+
 ENV python manage.py collectstatic --noinput 
 run python manage.py migrate --noinput
+RUN chmod 666 db.sqlite3 && chmod 777 .
 
 EXPOSE 8000
 
