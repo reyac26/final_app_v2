@@ -38,7 +38,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Trufflehog Secrets Scan
-        uses: trufflesecurity/trufflehog@e12da7682fde0d9818816b67fc19dfbe6f199852 
+        uses: trufflesecurity/trufflehog@e6b3602d338ab3c71a2bc003ceba966374a5d1a5 
         with:
           path: ./
           base: ""
