@@ -1,3 +1,4 @@
+
 name: Build-Curl-AWS
 
 on:
@@ -19,7 +20,6 @@ jobs:
       - name: docker-build
         run: |
           docker build -t pipeline-test .
-
       - name: docker-run
         env:
           DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
@@ -30,6 +30,12 @@ jobs:
             pipeline-test
             
           #docker run -d -p 8000:8000 -e DJANGO_SECRET_KEY="$DJANGO_SECRET_KEY" pipeline-test
+          
+      - name: curl-ftw
+        run: |
+          sleep 10
+          curl -f http://localhost:8000/ || (echo "=== DJANGO EXCEPTION TRAILING LOGS ===" && docker logs django-smoke-test && exit 1)
+
           
       - name: curl-ftw
         run: |
