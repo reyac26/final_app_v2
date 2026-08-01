@@ -76,3 +76,17 @@ jobs:
         with:
           STATE_KEY: ${{ secrets.STATE_KEY }}
           TF_STAGE: 'stage1'
+
+  build-tag-push:
+    needs: terraform-stage-1
+    runs-on: ubuntu-latest
+    steps:
+      - name: get_code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Authenticate to AWS via Keys
+        uses: aws-actions/configure-aws-credentials@v4.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
