@@ -6,7 +6,10 @@ terraform {
     }
   }
 
-  backend "s3" {} 
+  backend "s3" {
+    bucket = "nereydacastro-final-state-bucket-v2"
+    region = "us-east-1"
+  }
 }
 
 provider "aws" {
