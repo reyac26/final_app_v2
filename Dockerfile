@@ -4,15 +4,9 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
-
-ENV DJANGO_SECRET_KEY="build-time-placeholder-key-string"
-
-ENV python manage.py collectstatic --noinput 
-run python manage.py migrate --noinput
-RUN chmod 666 db.sqlite3 && chmod 777 .
 
 EXPOSE 8000
 
