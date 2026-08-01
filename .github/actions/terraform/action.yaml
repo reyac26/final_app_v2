@@ -1,0 +1,17 @@
+name: 'Terraform container actions'
+description: 'Terraform action demonstrates via a Secure OIDC'
+author: 'nereydacastro'
+inputs:
+  TF_STAGE:
+    description: 'Terraform Stage'
+    required: true
+    default: 'plan'
+  STATE_KEY:
+    description: 'Our Personal I.D.'
+    required: true
+  DJANGO_SECRET_KEY_PROD:
+    description: 'DJANGO Secret Key'
+    required: false
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
