@@ -142,17 +142,17 @@ jobs:
       - name: get_container_dns
         run: |
           echo "=== Step 1: Waiting for ECS Fargate Task to become RUNNING ==="
+          TASK_ARN=$(aws ecs list-tasks --cluster django-production-cluster --service-name django-fargate-service --query "taskArns[0]" --output text)
+          
           aws ecs wait tasks-running \
             --cluster django-production-cluster \
-            --tasks $(aws ecs list-tasks --cluster django-production-cluster --service-name django-fargate-service --query "taskArns" --output text)
+            --tasks "$TASK_ARN"
           
           echo "=== Step 2: Extracting Live Infrastructure Network Parameters ==="
-          TASK_ARN=$(aws ecs list-tasks --cluster django-production-cluster --service-name django-fargate-service --query "taskArns" --output text)
-          
-          ENI_ID=$(aws ecs describe-tasks --cluster django-production-cluster --tasks "$TASK_ARN" --query "tasks.attachments.details[?name=='networkInterfaceId'].value" --output text)
+          ENI_ID=$(aws ecs describe-tasks --cluster django-production-cluster --tasks "$TASK_ARN" --query "tasks[0].attachments[0].details[?name=='networkInterfaceId'].value |" --output text)
           echo "Target Network Card ENI identified: $ENI_ID"
           
-          PUBLIC_IP=$(aws ec2 describe-network-interfaces --network-interface-ids "$ENI_ID" --query "NetworkInterfaces.Association.PublicIp" --output text)
+          PUBLIC_IP=$(aws ec2 describe-network-interfaces --network-interface-ids "$ENI_ID" --query "NetworkInterfaces[0].Association.PublicIp" --output text)
           
           echo "=========================================================="
           echo " Target Live Cloud URL: http://$PUBLIC_IP:8000"
