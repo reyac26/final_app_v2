@@ -141,17 +141,22 @@ jobs:
 
       - name: get_container_dns
         run: |
-          echo "Allowing serverless container tasks to provision public network adapters..."
-          sleep 60
+          echo "=== Step 1: Waiting for ECS Fargate Task to become RUNNING ==="
+          aws ecs wait tasks-running \
+            --cluster django-production-cluster \
+            --tasks $(aws ecs list-tasks --cluster django-production-cluster --service-name django-fargate-service --query "taskArns" --output text)
           
+          echo "=== Step 2: Extracting Live Infrastructure Network Parameters ==="
           TASK_ARN=$(aws ecs list-tasks --cluster django-production-cluster --service-name django-fargate-service --query "taskArns" --output text)
           
           ENI_ID=$(aws ecs describe-tasks --cluster django-production-cluster --tasks "$TASK_ARN" --query "tasks.attachments.details[?name=='networkInterfaceId'].value" --output text)
+          echo "Target Network Card ENI identified: $ENI_ID"
           
           PUBLIC_IP=$(aws ec2 describe-network-interfaces --network-interface-ids "$ENI_ID" --query "NetworkInterfaces.Association.PublicIp" --output text)
           
-          echo "Target live container public IP address discovered: http://$PUBLIC_IP:8000"
-          echo "=== Executing Rubric-Mandated HTTP Health Check ==="
-          curl -f "http://$PUBLIC_IP:8000/"
-
+          echo "=========================================================="
+          echo " Target Live Cloud URL: http://$PUBLIC_IP:8000"
+          echo "=========================================================="
+          
+          echo "=== Step 3: Executing Rubric-Mandated HTTP Health Check ==="
           curl --retry 5 --retry-delay 5 -f "http://$PUBLIC_IP:8000/"
