@@ -124,3 +124,32 @@ jobs:
           STATE_KEY: ${{ secrets.STATE_KEY }}
           TF_STAGE: 'stage2' 
           DJANGO_SECRET_KEY_PROD: ${{ secrets.DJANGO_SECRET_KEY_PROD }}
+
+  pre-eval:
+    needs: terraform-stage-2
+    runs-on: ububuntu-latest
+    steps:
+      - name: get_code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Authenticate to AWS via Keys
+        uses: aws-actions/checkout-aws-credentials@4.1.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: get_container_dns
+        run: |
+          echo "Allowing serverless container tasks to provision public network adapters..."
+          sleep 60
+          
+          TASK_ARN=$(aws ecs list-tasks --cluster django-production-cluster --service-name django-fargate-service --query "taskArns" --output text)
+          
+          ENI_ID=$(aws ecs describe-tasks --cluster django-production-cluster --tasks "$TASK_ARN" --query "tasks.attachments.details[?name=='networkInterfaceId'].value" --output text)
+          
+          PUBLIC_IP=$(aws ec2 describe-network-interfaces --network-interface-ids "$ENI_ID" --query "NetworkInterfaces.Association.PublicIp" --output text)
+          
+          echo "Target live container public IP address discovered: http://$PUBLIC_IP:8000"
+          echo "=== Executing Rubric-Mandated HTTP Health Check ==="
+          curl -f "http://$PUBLIC_IP:8000/"
