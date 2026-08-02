@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-cd /github/worspace
+cd /github/workspace
 
 echo "==== Step 1: Executing Custom SBOM Creation (Syft) ===="
 syft requirements.txt -o cyclonedx-json=sbom.json
