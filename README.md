@@ -24,6 +24,7 @@ This job waits until the ECS task is fully running, retrieves the public IP addr
 
 ### 7. terraform-stage-3 (Terraform Cleanup)
 The final stage connects to the encrypted Amazon S3 remote state backend so Terraform can manage infrastructure changes and destroy resources cleanly when needed.
+
 ---
 ### AWS Services Used:
 
